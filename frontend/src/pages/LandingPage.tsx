@@ -34,7 +34,7 @@ export default function LandingPage() {
       <nav className={`fixed w-full top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Turnitin</div>
+            <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">TextVerity</div>
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className={`transition-colors ${scrolled ? 'text-gray-700' : 'text-gray-600'} hover:text-blue-600`}>Features</a>
               <a href="#how-it-works" className={`transition-colors ${scrolled ? 'text-gray-700' : 'text-gray-600'} hover:text-blue-600`}>How It Works</a>
@@ -60,7 +60,7 @@ export default function LandingPage() {
             <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Industry-Leading Accuracy</span>
           </h1>
           <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Turnitin uses advanced AI to detect plagiarism with 99.8% accuracy. Protect academic integrity while supporting original thinking.
+            TextVerity uses advanced AI to detect plagiarism with 99.8% accuracy. Protect academic integrity while supporting original thinking.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <button onClick={() => navigate('/register')} className="px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-lg">
@@ -160,7 +160,7 @@ export default function LandingPage() {
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-purple-600">
         <div className="max-w-4xl mx-auto text-center text-white">
           <h2 className="text-4xl font-bold mb-6">Ready to Transform Your Classroom?</h2>
-          <p className="text-xl mb-10 opacity-90">Join thousands of educators using Turnitin</p>
+          <p className="text-xl mb-10 opacity-90">Join thousands of educators using TextVerity</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button onClick={() => navigate('/register')} className="px-8 py-4 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100 transition-colors">Start Free Today</button>
             <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:bg-opacity-10 transition-colors">View Pricing</button>
@@ -172,12 +172,12 @@ export default function LandingPage() {
       <footer className="bg-gray-900 text-gray-300 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div><h4 className="text-white font-bold mb-4">Turnitin</h4><p className="text-sm">Enterprise plagiarism detection for academic integrity.</p></div>
+            <div><h4 className="text-white font-bold mb-4">TextVerity</h4><p className="text-sm">Enterprise plagiarism detection for academic integrity.</p></div>
             <div><h5 className="text-white font-semibold mb-4">Product</h5><ul className="space-y-2 text-sm"><li><a href="#features" className="hover:text-white transition">Features</a></li><li><a href="#pricing" className="hover:text-white transition">Pricing</a></li></ul></div>
             <div><h5 className="text-white font-semibold mb-4">Resources</h5><ul className="space-y-2 text-sm"><li><a href="#" className="hover:text-white transition">Documentation</a></li><li><a href="#" className="hover:text-white transition">Support</a></li></ul></div>
             <div><h5 className="text-white font-semibold mb-4">Legal</h5><ul className="space-y-2 text-sm"><li><a href="#" className="hover:text-white transition">Privacy</a></li><li><a href="#" className="hover:text-white transition">Terms</a></li></ul></div>
           </div>
-          <div className="border-t border-gray-800 pt-8"><p className="text-center text-sm">© 2026 Turnitin. All rights reserved.</p></div>
+          <div className="border-t border-gray-800 pt-8"><p className="text-center text-sm">© 2026 TextVerity. All rights reserved.</p></div>
         </div>
       </footer>
     </div>

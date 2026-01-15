@@ -5,32 +5,23 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKEND_PORT="${BACKEND_PORT:-8000}"
 FRONTEND_PORT="${FRONTEND_PORT:-5173}"
 
-pids=()
+# Use SQLite for native development
+export USE_SQLITE=true
+export DEBUG=true
 
-start_databases() {
-  echo "[databases] Starting PostgreSQL and Redis..."
-  cd "$ROOT_DIR/docker"
-  docker-compose up -d db redis
-  
-  echo "[databases] Waiting for PostgreSQL to be ready..."
-  for i in {1..30}; do
-    if docker-compose exec -T db pg_isready -U postgres >/dev/null 2>&1; then
-      echo "[databases] PostgreSQL is ready!"
-      break
-    fi
-    if [ $i -eq 30 ]; then
-      echo "[databases] Error: PostgreSQL failed to start"
-      exit 1
-    fi
-    sleep 1
-  done
-}
+pids=()
 
 start_backend() {
   echo "[backend] Starting Django dev server on ${BACKEND_PORT}..."
   (
     cd "$ROOT_DIR/backend"
-    "$ROOT_DIR/.venv/bin/python" manage.py runserver "0.0.0.0:${BACKEND_PORT}"
+    if [ -f "$ROOT_DIR/.venv/bin/python" ]; then
+      "$ROOT_DIR/.venv/bin/python" manage.py runserver "0.0.0.0:${BACKEND_PORT}"
+    elif [ -f "$ROOT_DIR/backend/venv/bin/python" ]; then
+      "$ROOT_DIR/backend/venv/bin/python" manage.py runserver "0.0.0.0:${BACKEND_PORT}"
+    else
+      python3 manage.py runserver "0.0.0.0:${BACKEND_PORT}"
+    fi
   ) &
   pids+=($!)
 }
@@ -54,9 +45,19 @@ cleanup() {
 
 trap cleanup EXIT INT TERM
 
-start_databases
+echo "Starting TextVerity Platform (Native - No Docker)..."
+echo "Database: SQLite"
+echo ""
+
 start_backend
+sleep 2
 start_frontend
 
-echo "All services running. Press Ctrl+C to stop."
+echo ""
+echo "All services running!"
+echo "Frontend: http://localhost:${FRONTEND_PORT}"
+echo "Backend:  http://localhost:${BACKEND_PORT}"
+echo "Admin:    http://localhost:${BACKEND_PORT}/admin"
+echo ""
+echo "Press Ctrl+C to stop all services."
 wait -n

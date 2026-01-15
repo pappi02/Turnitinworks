@@ -1,5 +1,5 @@
 """
-URL routing configuration for Turnitin SaaS platform.
+URL routing configuration for TextVerity platform.
 """
 
 from django.contrib import admin
@@ -7,15 +7,22 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+from .views import api_root
+from apps.submissions.views import AnalyticsView, AnalyticsExportView
 
 # API endpoints
 api_v1_patterns = [
     path('auth/', include('apps.users.urls')),
     path('submissions/', include('apps.submissions.urls')),
     path('turnitin/', include('apps.turnitin.urls')),
+    path('analytics/', AnalyticsView.as_view(), name='analytics'),
+    path('analytics/export/', AnalyticsExportView.as_view(), name='analytics-export'),
 ]
 
 urlpatterns = [
+    # Root landing page
+    path('', api_root, name='api-root'),
+    
     # Admin
     path('admin/', admin.site.urls),
     

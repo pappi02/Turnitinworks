@@ -6,6 +6,8 @@ import RegisterPage from './pages/RegisterPage'
 import Dashboard from './pages/Dashboard'
 import UploadPage from './pages/UploadPage'
 import ReportPage from './pages/ReportPage'
+import ReportsPage from './pages/ReportsPage'
+import SettingsPage from './pages/SettingsPage'
 import AnalyticsPage from './pages/AnalyticsPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
@@ -62,6 +64,27 @@ function App() {
               <ProtectedRoute>
                 <ErrorBoundary>
                   <AnalyticsPage />
+                </ErrorBoundary>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute>
+                <ErrorBoundary>
+                  <ReportsPage />
+                </ErrorBoundary>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <ErrorBoundary>
+                  <SettingsPage />
                 </ErrorBoundary>
               </ProtectedRoute>
             }

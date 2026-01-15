@@ -1,5 +1,5 @@
 """
-Celery configuration for Turnitin SaaS platform.
+Celery configuration for TextVerity platform.
 """
 
 import os

@@ -128,21 +128,12 @@ class TurnitinAPIClient:
     ) -> Dict[str, Any]:
         """
         Make authenticated request to Turnitin API with retry logic.
-        
-        Args:
-            method: HTTP method (GET, POST, PUT, DELETE)
-            endpoint: API endpoint path
-            token: OAuth access token (if available)
-            data: Request body data
-            files: Files for multipart upload
-            retries: Current retry attempt number
-        
-        Returns:
-            Response data as dictionary
-        
-        Raises:
-            TurnitinAPIError: If request fails after all retries
         """
+        # Mock for local development if running in DEBUG mode with no/default keys
+        if settings.DEBUG and (not self.api_key or not self.api_secret):
+             logger.warning(f"MOCKING Turnitin API Request: {method} {endpoint}")
+             return {'id': 'mock_id', 'turnitin_user_id': 'mock_turnitin_uid_123', 'status': 'success', 'user_data': {}}
+
         url = f"{self.api_url}{endpoint}"
         headers = self._get_auth_headers(token)
         
@@ -213,19 +204,13 @@ class TurnitinAPIClient:
     def authenticate_oauth(self, force_refresh: bool = False) -> str:
         """
         Obtain OAuth access token using client credentials flow.
-        
-        Uses caching to avoid excessive token requests.
-        Automatically refreshes expired tokens.
-        
-        Args:
-            force_refresh: Force token refresh even if cached
-        
-        Returns:
-            Access token string
-        
-        Raises:
-            TurnitinAPIError: If authentication fails
         """
+        # Mock for local development if keys are missing
+        if not self.api_key or not self.api_secret:
+            if settings.DEBUG:
+                logger.warning("Using MOCK Turnitin OAuth token (Debug mode + Missing Keys)")
+                return "mock_access_token_12345"
+
         # Check cache first
         if not force_refresh:
             cached_token = cache.get(self._token_cache_key)

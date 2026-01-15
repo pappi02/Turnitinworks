@@ -38,53 +38,15 @@ interface AnalyticsData {
 }
 
 interface AnalyticsDashboardProps {
-  data?: AnalyticsData;
+  data: AnalyticsData;
   dateRange: 'week' | 'month' | 'quarter' | 'year';
   onDateRangeChange: (range: 'week' | 'month' | 'quarter' | 'year') => void;
   onExport: () => void;
 }
 
-const mockAnalyticsData: AnalyticsData = {
-  totalSubmissions: 847,
-  averageSimilarity: 18.5,
-  highestSimilarity: 92,
-  lowestSimilarity: 2,
-  totalProcessingTime: 3450, // minutes
-  successRate: 97.5,
-  failureRate: 2.5,
-  submissionsByStatus: {
-    completed: 825,
-    processing: 12,
-    failed: 10,
-  },
-  similarityDistribution: [
-    { range: '0-10%', count: 312, percentage: 37 },
-    { range: '10-20%', count: 245, percentage: 29 },
-    { range: '20-30%', count: 156, percentage: 18 },
-    { range: '30-40%', count: 78, percentage: 9 },
-    { range: '>40%', count: 56, percentage: 7 },
-  ],
-  submissionsTrend: [
-    { date: 'Jan 8', count: 125, avgSimilarity: 16.2 },
-    { date: 'Jan 9', count: 118, avgSimilarity: 17.8 },
-    { date: 'Jan 10', count: 142, avgSimilarity: 19.3 },
-    { date: 'Jan 11', count: 156, avgSimilarity: 18.9 },
-    { date: 'Jan 12', count: 134, avgSimilarity: 20.1 },
-    { date: 'Jan 13', count: 148, avgSimilarity: 17.5 },
-    { date: 'Jan 14', count: 124, avgSimilarity: 18.7 },
-  ],
-  topSources: [
-    { title: 'Academic Database', count: 234, percentage: 28 },
-    { title: 'Wikipedia', count: 189, percentage: 22 },
-    { title: 'Published Papers', count: 167, percentage: 20 },
-    { title: 'Student Work', count: 142, percentage: 17 },
-    { title: 'Online Articles', count: 115, percentage: 13 },
-  ],
-};
-
 // Dashboard component
 const AnalyticsDashboard = ({
-  data = mockAnalyticsData,
+  data,
   dateRange,
   onDateRangeChange,
   onExport,
@@ -313,8 +275,8 @@ export default function AnalyticsPage() {
   
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dateRange, setDateRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData>(mockAnalyticsData);
-  const [isLoading, setIsLoading] = useState(false);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch analytics data when date range changes
@@ -333,16 +295,13 @@ export default function AnalyticsPage() {
         if (response.data?.data) {
           setAnalyticsData(response.data.data);
         } else {
-          // Use mock data if API doesn't return data
-          setAnalyticsData(mockAnalyticsData);
+          setError('No analytics data available');
         }
       } catch (err: any) {
         console.error('Analytics fetch error:', err);
-        // Use mock data on error
-        setAnalyticsData(mockAnalyticsData);
-        const errorMessage = err.response?.data?.message || 'Failed to fetch analytics. Using sample data.';
+        const errorMessage = err.response?.data?.message || 'Failed to fetch analytics data';
         setError(errorMessage);
-        notificationService.warning(errorMessage, 'Analytics');
+        notificationService.error(errorMessage, 'Analytics Error');
       } finally {
         setIsLoading(false);
       }
@@ -395,7 +354,7 @@ export default function AnalyticsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Turnitin</h1>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">TextVerity</h1>
             </div>
             
             {/* Desktop Navigation */}
@@ -461,21 +420,30 @@ export default function AnalyticsPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Error State */}
-        {error && (
-          <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="font-semibold text-yellow-900">API Connection Issue</h3>
-              <p className="text-sm text-yellow-800 mt-1">{error}</p>
-              <p className="text-xs text-yellow-700 mt-2">Showing sample data. Connect backend API to see real analytics.</p>
-            </div>
-          </div>
-        )}
-
         {/* Loading State */}
         {isLoading ? (
           <AnalyticsPageSkeleton />
+        ) : error || !analyticsData ? (
+          <div className="bg-white rounded-lg border border-red-200 p-12">
+            <div className="flex flex-col items-center justify-center gap-4">
+              <AlertCircle className="w-12 h-12 text-red-400" />
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-red-800 mb-2">Failed to Load Analytics</h3>
+                <p className="text-red-700 mb-4">{error || 'No analytics data available'}</p>
+                <button
+                  onClick={() => {
+                    setError(null);
+                    setIsLoading(true);
+                    // Re-trigger the useEffect
+                    setDateRange(dateRange);
+                  }}
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition text-sm font-medium"
+                >
+                  Retry
+                </button>
+              </div>
+            </div>
+          </div>
         ) : (
           <AnalyticsDashboard
             data={analyticsData}

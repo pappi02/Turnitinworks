@@ -286,8 +286,8 @@ export const NotificationPanel = ({ isOpen, onClose }: NotificationPanelProps) =
 /**
  * Helper function to format time
  */
-function formatTime(timestamp: string | Date): string {
-  const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+function formatTime(timestamp: number): string {
+  const date = new Date(timestamp); // Convert from Unix timestamp to Date
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);

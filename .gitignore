@@ -34,3 +34,7 @@ backend/staticfiles/
 
 # OS
 Thumbs.db
+
+
+
+docs/

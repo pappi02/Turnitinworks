@@ -40,7 +40,7 @@ body {
 /* Button styles */
 .btn-primary {
   /* stylelint-disable-next-line */
-  @apply bg-turnitin-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-opacity-90 transition-all;
+  @apply bg-textverity-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-opacity-90 transition-all;
 }
 
 .btn-secondary {
@@ -50,13 +50,13 @@ body {
 
 .btn-danger {
   /* stylelint-disable-next-line */
-  @apply bg-turnitin-danger text-white px-6 py-2 rounded-lg font-medium hover:bg-opacity-90 transition-all;
+  @apply bg-textverity-danger text-white px-6 py-2 rounded-lg font-medium hover:bg-opacity-90 transition-all;
 }
 
 /* Form styles */
 .form-input {
   /* stylelint-disable-next-line */
-  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-turnitin-primary focus:border-transparent transition-all;
+  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-textverity-primary focus:border-transparent transition-all;
 }
 
 .form-input:disabled {

@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
+    username: '',
     email: '',
     first_name: '',
     last_name: '',
@@ -51,10 +52,12 @@ export default function RegisterPage() {
       }
 
       const response = await register({
+        username: formData.username,
         email: formData.email,
         first_name: formData.first_name,
         last_name: formData.last_name,
         password: formData.password,
+        password_confirm: formData.password_confirm,
       });
 
       setSuccess('Account created successfully! Logging in...');
@@ -69,13 +72,28 @@ export default function RegisterPage() {
     } catch (err: any) {
       if (err.response?.data) {
         const errorData = err.response.data;
-        if (typeof errorData === 'object') {
+        
+        // Handle structured error response
+        if (errorData.errors && typeof errorData.errors === 'object') {
+          // Extract validation errors from errors object
+          const messages = Object.entries(errorData.errors)
+            .map(([key, value]) => {
+              const errorMsg = Array.isArray(value) ? value.join(', ') : String(value);
+              return `${key}: ${errorMsg}`;
+            })
+            .join(' | ');
+          setError(messages || errorData.detail || 'Validation failed');
+        } else if (errorData.detail) {
+          setError(errorData.detail);
+        } else if (typeof errorData === 'object') {
+          // Fallback for other object formats
           const messages = Object.entries(errorData)
+            .filter(([key]) => key !== 'success' && key !== 'error_code' && key !== 'timestamp' && key !== 'request_id')
             .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
             .join(' | ');
-          setError(messages);
+          setError(messages || 'Registration failed');
         } else {
-          setError(errorData.detail || 'Registration failed');
+          setError(String(errorData) || 'Registration failed');
         }
       } else {
         setError(err.message || 'Registration failed');
@@ -154,6 +172,24 @@ export default function RegisterPage() {
                     disabled={loading}
                   />
                 </div>
+              </div>
+            </div>
+            {/* Username Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
+              <div className="relative">
+                <User className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  placeholder="johndoe123"
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition"
+                  autoComplete="username"
+                  required
+                  disabled={loading}
+                />
               </div>
             </div>
 

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TextVerity API</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 680px;
+            width: 100%;
+            padding: 30px 25px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #10b981;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .link-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px 14px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+            display: block;
+        }
+
+        .link-card:hover {
+            border-color: #667eea;
+            background: #f3f4f6;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.12);
+        }
+
+        .link-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 2px;
+        }
+
+        .icon {
+            font-size: 16px;
+        }
+
+        .link-url {
+            font-size: 11px;
+            color: #9ca3af;
+            font-family: 'Courier New', monospace;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #9ca3af;
+            font-size: 11px;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 25px 20px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .links {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (min-width: 641px) and (max-width: 768px) {
+            .links {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">TextVerity</div>
+            <div class="subtitle">Academic Integrity Platform</div>
+            <div class="status">
+                <span class="status-dot"></span>
+                Online
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🚀 Quick Access</div>
+            <div class="links">
+                <a href="/admin/" class="link-card">
+                    <div class="link-title">
+                        <span class="icon">🔐</span>
+                        Admin
+                    </div>
+                    <div class="link-url">/admin/</div>
+                </a>
+
+                <a href="/api/docs/" class="link-card">
+                    <div class="link-title">
+                        <span class="icon">📚</span>
+                        API Docs
+                    </div>
+                    <div class="link-url">/api/docs/</div>
+                </a>
+
+                <a href="/api/redoc/" class="link-card">
+                    <div class="link-title">
+                        <span class="icon">📖</span>
+                        ReDoc
+                    </div>
+                    <div class="link-url">/api/redoc/</div>
+                </a>
+
+                <a href="/api/schema/" class="link-card">
+                    <div class="link-title">
+                        <span class="icon">🔧</span>
+                        Schema
+                    </div>
+                    <div class="link-url">/api/schema/</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🔌 API Endpoints</div>
+            <div class="links">
+                <a href="/api/v1/auth/" class="link-card">
+                    <div class="link-title">
+                        <span class="icon">👤</span>
+                        Auth
+                    </div>
+                    <div class="link-url">/api/v1/auth/</div>
+                </a>
+
+                <a href="/api/v1/submissions/" class="link-card">
+                    <div class="link-title">
+                        <span class="icon">📄</span>
+                        Submissions
+                    </div>
+                    <div class="link-url">/api/v1/submissions/</div>
+                </a>
+
+                <a href="/api/v1/turnitin/" class="link-card">
+                    <div class="link-title">
+                        <span class="icon">🔍</span>
+                        Turnitin
+                    </div>
+                    <div class="link-url">/api/v1/turnitin/</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer">
+            © 2026 TextVerity • v1.0.0
+        </div>
+    </div>
+</body>
+</html>

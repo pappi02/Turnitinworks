@@ -1,5 +1,5 @@
 """
-ASGI config for Turnitin SaaS platform.
+ASGI config for TextVerity platform.
 """
 
 import os

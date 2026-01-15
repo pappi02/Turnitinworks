@@ -1,4 +1,30 @@
-# Quick Start Guide
+# TextVerity - Quick Start Guide
+
+## Quick Start (Recommended)
+
+### Prerequisites
+- Python 3.10+
+- Node.js 16+
+
+### Start Platform
+```bash
+# Windows
+.\start-all.ps1
+
+# Linux/Mac
+./start-all.sh
+```
+
+**Access:**
+- Frontend: http://localhost:5173
+- Backend: http://localhost:8000
+- Admin: http://localhost:8000/admin
+
+**Admin Login:**
+- Username: `admin`
+- Password: `Admin123456!`
+
+---
 
 ## Backend Development
 
@@ -69,33 +95,6 @@ npm install package-name
 
 ---
 
-## Docker Development
-
-### Start All Services
-```bash
-cd docker
-docker-compose up --build
-```
-
-**Services:**
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- Database: postgres://localhost:5432
-- Redis: localhost:6379
-
-### View Logs
-```bash
-docker-compose logs -f backend
-docker-compose logs -f frontend
-```
-
-### Stop Services
-```bash
-docker-compose down
-```
-
----
-
 ## Environment Configuration
 
 ### Backend .env File
@@ -138,15 +137,25 @@ npm run test
 
 ## Database
 
-### Connect to PostgreSQL (Docker)
-```bash
-docker exec -it turnitin_db psql -U postgres -d turnitin_db
+### SQLite (Development - Default)
+Database file: `backend/db.sqlite3`
+
+### PostgreSQL (Production)
+Configure in `.env`:
+```env
+USE_SQLITE=false
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=textverity_db
+DB_USER=your_user
+DB_PASSWORD=your_password
+DB_HOST=localhost
+DB_PORT=5432
 ```
 
 ### Reset Database
 ```bash
 cd backend
-source venv/bin/activate
+source venv/bin/activate  # Windows: .\venv\Scripts\activate
 python manage.py flush  # Warning: Deletes all data
 ```
 
@@ -227,9 +236,10 @@ python manage.py runserver 8001
 ## Project Structure Reference
 
 ```
-/workspaces/Turnitinworks/
+Turnitinworks/
 ├── backend/
-│   ├── venv/                 # Virtual environment
+│   ├── venv/                 # Python virtual environment
+│   ├── db.sqlite3            # SQLite database (development)
 │   ├── apps/
 │   │   ├── users/            # User management
 │   │   ├── submissions/      # Document submissions
@@ -238,26 +248,23 @@ python manage.py runserver 8001
 │   ├── config/               # Django settings
 │   ├── manage.py
 │   └── requirements.txt
+│
 ├── frontend/
 │   ├── node_modules/         # NPM packages
+│   ├── dist/                 # Production build
 │   ├── src/
 │   │   ├── components/       # React components
 │   │   ├── pages/            # Page components
 │   │   ├── store/            # Redux state
 │   │   ├── services/         # API clients
 │   │   ├── hooks/            # Custom hooks
-│   │   ├── types/            # TypeScript types
 │   │   └── utils/            # Utilities
-│   ├── index.html
 │   ├── vite.config.ts
 │   └── package.json
-├── docker/
-│   ├── docker-compose.yml
-│   ├── Dockerfile.backend
-│   └── Dockerfile.frontend
-└── docs/
+│
+├── docs/                     # Documentation
+├── start-all.ps1             # Windows startup script
+├── start-all.sh              # Linux/Mac startup script
+├── README.md
+└── .env                      # Configuration
 ```
-
----
-
-**Next Task:** Step 7 - Implement Turnitin User Provisioning

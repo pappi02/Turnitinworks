@@ -23,6 +23,14 @@ const getApiBaseUrl = (): string => {
       console.log('[API] GitHub Codespaces detected, using:', backendUrl);
       return backendUrl;
     }
+
+    // For local development, use the same hostname to avoid CORS issues
+    // This allows access from both localhost and network IPs (192.168.x.x)
+    if (hostname !== "localhost" && hostname !== "127.0.0.1") {
+      const backendUrl = `${protocol}//${hostname}:8000/api/v1`;
+      console.log('[API] Using network IP for backend:', backendUrl);
+      return backendUrl;
+    }
   }
 
   // Default to localhost for local development

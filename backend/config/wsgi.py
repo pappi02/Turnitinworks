@@ -1,5 +1,5 @@
 """
-WSGI config for Turnitin SaaS platform.
+WSGI config for TextVerity platform.
 """
 
 import os

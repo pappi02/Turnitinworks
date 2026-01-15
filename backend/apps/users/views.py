@@ -54,8 +54,12 @@ class UserRegistrationView(TokenObtainPairView):
             user = serializer.save()
             
             # Queue Turnitin provisioning task asynchronously
-            provision_turnitin_user.delay(user.id)
-            
+            try:
+                provision_turnitin_user.delay(user.id)
+            except Exception as task_error:
+                # Log but don't fail registration if provisioning fails (common in dev)
+                logger.warning(f"Turnitin provisioning failed for user {user.id}: {str(task_error)}")
+
             # Generate tokens
             refresh = RefreshToken.for_user(user)
             
@@ -73,7 +77,7 @@ class UserRegistrationView(TokenObtainPairView):
             logger.error(f"Registration error: {str(e)}")
             return Response({
                 'success': False,
-                'detail': _('Registration failed. Please try again.'),
+                'detail': f'Registration failed: {str(e)}',
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -94,27 +98,41 @@ class UserLoginView(TokenObtainPairView):
     
     def post(self, request, *args, **kwargs):
         """Login user."""
-        response = super().post(request, *args, **kwargs)
+        # Validate and get user from serializer first
+        serializer = self.get_serializer(data=request.data)
         
-        if response.status_code == status.HTTP_200_OK:
-            user = request.user if hasattr(request, 'user') else None
-            if not user:
-                # Retrieve user from serializer
-                serializer = self.get_serializer(data=request.data)
-                if serializer.is_valid():
-                    user = serializer.validated_data.get('user')
-            
-            logger.info(f"User logged in: {request.data.get('username')}")
-            
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            logger.warning(f"Login validation failed: {str(e)}")
             return Response({
-                'success': True,
-                'message': _('Login successful'),
-                'user': UserProfileSerializer(user).data if user else None,
-                'access': response.data.get('access'),
-                'refresh': response.data.get('refresh'),
-            }, status=status.HTTP_200_OK)
+                'success': False,
+                'detail': str(e.detail) if hasattr(e, 'detail') else str(e),
+            }, status=status.HTTP_401_UNAUTHORIZED)
         
-        return response
+        # Get validated user
+        user = serializer.validated_data.get('user')
+        
+        if not user:
+            logger.warning("User not found in validated data")
+            return Response({
+                'success': False,
+                'detail': 'Authentication failed',
+            }, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Generate tokens for the user
+        from rest_framework_simplejwt.tokens import RefreshToken
+        refresh = RefreshToken.for_user(user)
+        
+        logger.info(f"User logged in: {request.data.get('username')}")
+        
+        return Response({
+            'success': True,
+            'message': _('Login successful'),
+            'user': UserProfileSerializer(user).data,
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+        }, status=status.HTTP_200_OK)
 
 
 class UserLogoutView(viewsets.ViewSet):

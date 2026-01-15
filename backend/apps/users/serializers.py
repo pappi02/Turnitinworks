@@ -84,40 +84,66 @@ class UserLoginSerializer(TokenObtainPairSerializer):
     
     def validate(self, attrs):
         """Authenticate user with email or username."""
+        import logging
+        logger = logging.getLogger(__name__)
+        
         username = attrs.get('username')
         password = attrs.get('password')
         
+        logger.info(f"[UserLoginSerializer] Login attempt with username: {username}")
+        
+        if not username or not password:
+            logger.warning("[UserLoginSerializer] Username or password missing")
+            raise serializers.ValidationError('Username/email and password required.')
+        
         try:
-            # Try to find user by email first
-            user = User.objects.get(email=username)
+            # Try to find user by email first (case-insensitive)
+            user = User.objects.get(email__iexact=username)
+            logger.info(f"[UserLoginSerializer] Found user by email: {user.email}")
         except User.DoesNotExist:
             try:
-                # Fall back to username
-                user = User.objects.get(username=username)
+                # Fall back to username (case-insensitive)
+                user = User.objects.get(username__iexact=username)
+                logger.info(f"[UserLoginSerializer] Found user by username: {user.username}")
             except User.DoesNotExist:
-                raise serializers.ValidationError('Invalid email or username.')
+                logger.warning(f"[UserLoginSerializer] No user found with identifier: {username}")
+                raise serializers.ValidationError('No account found with these credentials.')
+        
+        # Check if user is active
+        logger.info(f"[UserLoginSerializer] User {user.username} is_active: {user.is_active}")
+        if not user.is_active:
+            logger.warning(f"[UserLoginSerializer] User {user.username} is not active")
+            raise serializers.ValidationError('This account has been disabled.')
         
         # Check if account is locked
-        if user.is_account_locked():
+        is_locked = user.is_account_locked()
+        logger.info(f"[UserLoginSerializer] User {user.username} is_locked: {is_locked}")
+        if is_locked:
             raise serializers.ValidationError(
                 'Account is temporarily locked due to too many login attempts. Please try again later.'
             )
         
         # Verify password
-        if not user.check_password(password):
+        password_valid = user.check_password(password)
+        logger.info(f"[UserLoginSerializer] Password check for {user.username}: {password_valid}")
+        if not password_valid:
             user.increment_login_attempts()
-            raise serializers.ValidationError('Invalid password.')
+            logger.warning(f"[UserLoginSerializer] Invalid password for user {user.username}")
+            raise serializers.ValidationError('Invalid credentials.')
         
         # Reset login attempts on successful login
         user.reset_login_attempts()
+        logger.info(f"[UserLoginSerializer] Login successful for user {user.username}")
         
         # Update last login
         from django.utils import timezone
         user.last_login_at = timezone.now()
         user.save(update_fields=['last_login_at'])
         
+        # Return attrs with user - do NOT call super().validate() as it will try to authenticate again
+        # and fail because Django's authenticate() doesn't support our custom email/username lookup
         attrs['user'] = user
-        return super().validate(attrs)
+        return attrs
     
     @classmethod
     def get_token(cls, user):

@@ -7,7 +7,7 @@ export interface Notification {
   message: string;
   title?: string;
   duration?: number;
-  timestamp: Date;
+  timestamp: number; // Unix timestamp in milliseconds
   read: boolean;
   action?: {
     label: string;
@@ -41,7 +41,7 @@ export const notificationSlice = createSlice({
       const notification: Notification = {
         ...action.payload,
         id: uuidv4(),
-        timestamp: new Date(),
+        timestamp: Date.now(), // Store as number (milliseconds since epoch)
         read: false,
       };
 

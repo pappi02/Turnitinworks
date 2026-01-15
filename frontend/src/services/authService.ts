@@ -1,8 +1,10 @@
 import api from "./api";
 
 interface RegisterRequest {
+  username: string;
   email: string;
   password: string;
+  password_confirm: string;
   first_name: string;
   last_name: string;
 }
@@ -31,11 +33,11 @@ interface UserProfileResponse {
 
 // Frontend-facing functions with simple parameter names
 export const login = async (
-  email: string,
+  usernameOrEmail: string,
   password: string
 ): Promise<AuthResponse> => {
   const response = await api.post<AuthResponse>("/auth/login/", {
-    email_or_username: email,
+    username: usernameOrEmail,
     password,
   });
 
@@ -51,8 +53,9 @@ export const register = async (
 ): Promise<AuthResponse> => {
   const response = await api.post<AuthResponse>("/auth/register/", {
     email: data.email,
-    username: data.email.split("@")[0], // Auto-generate username from email
+    username: data.username,
     password: data.password,
+    password_confirm: data.password_confirm,
     first_name: data.first_name,
     last_name: data.last_name,
   });

@@ -45,13 +45,6 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [stats] = useState({
-    totalSubmissions: 127,
-    processingNow: 3,
-    highSimilarity: 8,
-    averageSimilarity: 18,
-  });
-
   // Fetch submissions from API
   useEffect(() => {
     const fetchSubmissions = async () => {
@@ -61,15 +54,16 @@ export default function Dashboard() {
         const response = await api.get('/submissions/');
         
         // Transform API response to component format
-        const submissionsData = response.data.submissions?.map((sub: any) => ({
+        const rawSubmissions = Array.isArray(response.data.submissions) ? response.data.submissions : [];
+        const submissionsData = rawSubmissions.map((sub: any) => ({
           id: sub.id,
-          title: sub.title || sub.file_name,
+          title: sub.title || sub.original_filename,
           student: sub.user?.name || sub.user?.username || 'Unknown',
           date: sub.created_at?.split('T')[0] || new Date().toISOString().split('T')[0],
-          similarity: sub.similarity_percentage || 0,
+          similarity: sub.similarity_score || 0,
           status: sub.status || 'pending',
           reportUrl: sub.report_url || '#',
-        })) || [];
+        }));
         
         setSubmissions(submissionsData);
         
@@ -151,6 +145,16 @@ export default function Dashboard() {
   };
 
   const filteredSubmissions = getFilteredSubmissions();
+
+  // Calculate stats dynamically from submissions
+  const stats = {
+    totalSubmissions: submissions.length,
+    processingNow: submissions.filter(s => s.status === 'processing').length,
+    highSimilarity: submissions.filter(s => s.similarity >= 30).length,
+    averageSimilarity: submissions.length > 0
+      ? Math.round(submissions.reduce((sum, s) => sum + s.similarity, 0) / submissions.length)
+      : 0,
+  };
 
   // Handle search and filter
   const handleSearch = (query: string, filters: FilterOptions) => {
@@ -325,14 +329,24 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Turnitin</h1>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">TextVerity</h1>
             </div>
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-6">
               <nav className="flex items-center gap-6">
-                <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">Dashboard</a>
-                <a href="#" className="text-gray-600 hover:text-blue-600">Reports</a>
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="text-gray-700 hover:text-blue-600 font-medium"
+                >
+                  Dashboard
+                </button>
+                <button
+                  onClick={() => navigate('/reports')}
+                  className="text-gray-600 hover:text-blue-600"
+                >
+                  Reports
+                </button>
                 <RBACGuard
                   permission="view_course_analytics"
                   fallback={
@@ -346,7 +360,12 @@ export default function Dashboard() {
                     Analytics
                   </button>
                 </RBACGuard>
-                <a href="#" className="text-gray-600 hover:text-blue-600">Settings</a>
+                <button
+                  onClick={() => navigate('/settings')}
+                  className="text-gray-600 hover:text-blue-600"
+                >
+                  Settings
+                </button>
               </nav>
               <div className="flex items-center gap-4 border-l border-gray-200 pl-6">
                 <span className="text-sm text-gray-700">{user?.email || 'User'}</span>
@@ -372,10 +391,28 @@ export default function Dashboard() {
           {/* Mobile Menu */}
           {mobileMenuOpen && (
             <div className="md:hidden border-t border-gray-200 py-4 space-y-4">
-              <a href="#" className="block text-gray-700 hover:text-blue-600 font-medium">Dashboard</a>
-              <a href="#" className="block text-gray-600 hover:text-blue-600">Reports</a>
-              <a href="#" className="block text-gray-600 hover:text-blue-600">Settings</a>
-              <button onClick={handleLogout} className="w-full text-left text-gray-600 hover:text-blue-600 py-2">
+              <button
+                onClick={() => { navigate('/dashboard'); setMobileMenuOpen(false); }}
+                className="block w-full text-left text-gray-700 hover:text-blue-600 font-medium"
+              >
+                Dashboard
+              </button>
+              <button
+                onClick={() => { navigate('/reports'); setMobileMenuOpen(false); }}
+                className="block w-full text-left text-gray-600 hover:text-blue-600"
+              >
+                Reports
+              </button>
+              <button
+                onClick={() => { navigate('/settings'); setMobileMenuOpen(false); }}
+                className="block w-full text-left text-gray-600 hover:text-blue-600"
+              >
+                Settings
+              </button>
+              <button
+                onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+                className="w-full text-left text-gray-600 hover:text-blue-600 py-2"
+              >
                 Logout
               </button>
             </div>
@@ -507,15 +544,16 @@ export default function Dashboard() {
                     const fetchSubmissions = async () => {
                       try {
                         const response = await api.get('/submissions/');
-                        const submissionsData = response.data.submissions?.map((sub: any) => ({
+                        const rawSubmissions = Array.isArray(response.data.submissions) ? response.data.submissions : [];
+                        const submissionsData = rawSubmissions.map((sub: any) => ({
                           id: sub.id,
-                          title: sub.title || sub.file_name,
+                          title: sub.title || sub.original_filename,
                           student: sub.user?.name || sub.user?.username || 'Unknown',
                           date: sub.created_at?.split('T')[0] || new Date().toISOString().split('T')[0],
-                          similarity: sub.similarity_percentage || 0,
+                          similarity: sub.similarity_score || 0,
                           status: sub.status || 'pending',
                           reportUrl: sub.report_url || '#',
-                        })) || [];
+                        }));
                         setSubmissions(submissionsData);
                       } catch (err: any) {
                         setError(err.response?.data?.message || err.message || 'Failed to fetch submissions');

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useDispatch } from 'react-redux';
@@ -19,13 +19,39 @@ export default function LoginPage() {
   
   const from = location.state?.from?.pathname || '/dashboard';
 
+  // Check for persisted error logs
+  useEffect(() => {
+    const persistedLogs = localStorage.getItem('loginDebugLogs');
+    if (persistedLogs) {
+      console.log('[LoginPage] Persisted logs from previous attempt:');
+      console.log(persistedLogs);
+    }
+  }, []);
+
+  const addLog = (message: string) => {
+    const timestamp = new Date().toISOString();
+    const logEntry = `[${timestamp}] ${message}`;
+    console.log(logEntry);
+    
+    // Persist to localStorage
+    const existing = localStorage.getItem('loginDebugLogs') || '';
+    const newLogs = existing + '\n' + logEntry;
+    localStorage.setItem('loginDebugLogs', newLogs.substring(newLogs.length - 2000)); // Keep last 2000 chars
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+    
+    addLog('[LoginPage] Form submitted');
+    addLog(`[LoginPage] Email/Username: ${email}`);
+    addLog('[LoginPage] Calling login API...');
 
     try {
       const response = await login(email, password);
+      addLog('[LoginPage] Login API returned successfully');
+      addLog(`[LoginPage] Response: ${JSON.stringify(response).substring(0, 200)}`);
       
       dispatch(setAuth({
         user: response.user,
@@ -39,11 +65,28 @@ export default function LoginPage() {
         localStorage.removeItem('rememberEmail');
       }
 
+      addLog('[LoginPage] Auth dispatched, navigating to dashboard');
+      localStorage.removeItem('loginDebugLogs'); // Clear logs on success
       navigate(from, { replace: true });
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Invalid email or password');
-    } finally {
-      setLoading(false);
+      addLog(`[LoginPage] Caught error: ${err.message}`);
+      addLog(`[LoginPage] Error response status: ${err.response?.status}`);
+      addLog(`[LoginPage] Error response data: ${JSON.stringify(err.response?.data)}`);
+      
+      // Extract error message from multiple possible locations
+      let errorMessage = 'Invalid email or password';
+      if (err.response?.data) {
+        if (err.response.data.detail) {
+          errorMessage = err.response.data.detail;
+        } else if (err.response.data.non_field_errors && Array.isArray(err.response.data.non_field_errors)) {
+          errorMessage = err.response.data.non_field_errors[0];
+        } else if (typeof err.response.data === 'string') {
+          errorMessage = err.response.data;
+        }
+      }
+      addLog(`[LoginPage] Final error message: ${errorMessage}`);
+      setError(errorMessage);
+      setLoading(false); // Explicitly set to false on error
     }
   };
 
@@ -52,7 +95,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">Turnitin</h1>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">TextVerity</h1>
           <p className="text-gray-600">Sign in to your account</p>
         </div>
 
@@ -70,14 +113,14 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email Address or Username</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
                 <input
-                  type="email"
+                  type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  placeholder="Email or Username"
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition"
                   autoComplete="email"
                   required
