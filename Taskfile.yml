@@ -1,0 +1,69 @@
+version: '3'
+
+tasks:
+  backend:install:
+    desc: Install backend dependencies
+    cmds:
+      - cd backend && pip install -r requirements.txt
+
+  backend:migrate:
+    desc: Run Django migrations
+    cmds:
+      - cd backend && python manage.py migrate
+
+  backend:createsuperuser:
+    desc: Create Django superuser
+    cmds:
+      - cd backend && python manage.py createsuperuser
+
+  backend:runserver:
+    desc: Run Django development server
+    cmds:
+      - cd backend && python manage.py runserver
+
+  backend:test:
+    desc: Run backend tests
+    cmds:
+      - cd backend && pytest
+
+  frontend:install:
+    desc: Install frontend dependencies
+    cmds:
+      - cd frontend && npm install
+
+  frontend:dev:
+    desc: Run frontend development server
+    cmds:
+      - cd frontend && npm run dev
+
+  frontend:build:
+    desc: Build frontend for production
+    cmds:
+      - cd frontend && npm run build
+
+  frontend:test:
+    desc: Run frontend tests
+    cmds:
+      - cd frontend && npm run test
+
+  docker:up:
+    desc: Start all services with Docker Compose
+    cmds:
+      - docker-compose -f docker/docker-compose.yml up -d
+
+  docker:down:
+    desc: Stop all Docker services
+    cmds:
+      - docker-compose -f docker/docker-compose.yml down
+
+  docker:logs:
+    desc: View Docker service logs
+    cmds:
+      - docker-compose -f docker/docker-compose.yml logs -f
+
+  setup:
+    desc: Initial project setup
+    cmds:
+      - task: backend:install
+      - task: backend:migrate
+      - task: frontend:install

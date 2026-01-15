@@ -1,0 +1,36 @@
+# System files
+.DS_Store
+.env
+.env.local
+*.pyc
+__pycache__/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Frontend
+node_modules/
+frontend/dist/
+
+# Backend
+backend/venv/
+backend/logs/
+backend/media/
+backend/staticfiles/
+
+# Docker
+.dockerignore
+
+# Database
+*.db
+*.sqlite3
+
+# OS
+Thumbs.db
