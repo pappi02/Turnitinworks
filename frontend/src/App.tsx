@@ -18,7 +18,7 @@ function App() {
   const { user, access } = useSelector((state: any) => state.auth)
 
   return (
-    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <Router>
       <ErrorBoundary>
         <NotificationCenter />
         <Routes>
