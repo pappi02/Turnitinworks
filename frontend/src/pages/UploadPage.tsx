@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, X, AlertCircle, CheckCircle, File, Loader } from 'lucide-react';
+import { Upload, X, AlertCircle, CheckCircle, Loader } from 'lucide-react';
 
 interface UploadedFile {
   id: string;

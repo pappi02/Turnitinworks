@@ -10,10 +10,10 @@ celery==5.3.4
 redis==5.0.1
 django-filter==23.5
 drf-spectacular==0.27.0
-gunicorn==21.2.0
+gunicorn==23.0.0
 django-ratelimit==4.1.0
-sentry-sdk==1.39.2
-python-dotenv==1.0.0
+sentry-sdk==1.45.1
+python-dotenv==1.2.2
 PyJWT==2.15.1
 bcrypt==4.1.2
 Pillow==13.0.0
